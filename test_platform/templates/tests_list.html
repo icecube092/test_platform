@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <ul>
+        {% for test in tests %}
+            <li><a href="/tests/?test_id={{test.id}}">{{test.title}}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="../1">First</a>
+    <a href="../{{prev_page}}">Back</a>
+    <a href="../{{next_page}}">Forward</a>
+    <a href="#">Last</a>
+{% endblock %}

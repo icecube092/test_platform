@@ -3,18 +3,18 @@ from django.db import models
 
 # Create your models here.
 class Question(models.Model):
-    text = models.TextField()
-    option_1 = models.TextField(name="1")
-    option_2 = models.TextField(name="2")
-    option_3 = models.TextField(name="3")
-    option_4 = models.TextField(name="4")
+    text = models.CharField(max_length=250)
+    option_1 = models.CharField(max_length=100, name="1")
+    option_2 = models.CharField(max_length=100, name="2")
+    option_3 = models.CharField(max_length=100, name="3")
+    option_4 = models.CharField(max_length=100, name="4")
     OPTIONS = (
         ("1", option_1.name),
         ("2", option_2.name),
         ("3", option_3.name),
         ("2", option_4.name)
     )
-    right = models.TextField(choices=OPTIONS, name="Правильный ответ")
+    right = models.CharField(max_length=10, choices=OPTIONS, name="Правильный ответ")
 
     def __str__(self):
         return self.text
