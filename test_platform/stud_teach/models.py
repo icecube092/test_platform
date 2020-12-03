@@ -4,34 +4,42 @@ from django.db import models
 # Create your models here.
 class Question(models.Model):
     text = models.CharField(max_length=250)
-    option_1 = models.CharField(max_length=100, name="1")
-    option_2 = models.CharField(max_length=100, name="2")
-    option_3 = models.CharField(max_length=100, name="3")
-    option_4 = models.CharField(max_length=100, name="4")
+    option_1 = models.CharField(max_length=100)
+    option_2 = models.CharField(max_length=100)
+    option_3 = models.CharField(max_length=100)
+    option_4 = models.CharField(max_length=100)
     OPTIONS = (
-        ("1", option_1.name),
-        ("2", option_2.name),
-        ("3", option_3.name),
-        ("2", option_4.name)
+        ("1", option_1),
+        ("2", option_2),
+        ("3", option_3),
+        ("2", option_4)
     )
     right = models.CharField(max_length=10, choices=OPTIONS, name="Правильный ответ")
 
     def __str__(self):
         return self.text
 
+    class Meta:
+        verbose_name = "Вопрос"
+        verbose_name_plural = "Вопросы"
+
 
 class Test(models.Model):
     title = models.CharField(max_length=100, default="Тест")
-    questions = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
+    questions = models.ManyToManyField(Question)
 
     def __str__(self):
         return self.title
 
+    class Meta:
+        verbose_name = "Тест"
+        verbose_name_plural = "Тесты"
+
 
 class Student(User):
-    done_tests = models.ManyToManyField(Test)
     avatar = models.ImageField(blank=True)
     phone = models.CharField(max_length=11, blank=True)
+    done_tests = models.ManyToManyField(Test, related_name="done_tests")
 
     class Meta:
         verbose_name = "Студент"
@@ -40,6 +48,18 @@ class Student(User):
     def __str__(self):
         return self.username
 
+
+class ResultTest(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    passed = models.IntegerField()
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.test.title} - {self.student.username}"
+
+    class Meta:
+        verbose_name = "Результат теста"
+        verbose_name_plural = "Результаты тестов"
 
 class Teacher(User):
     class Meta:

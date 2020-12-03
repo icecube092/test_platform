@@ -12,7 +12,7 @@ class CreateUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput, min_length=8, max_length=32)
     password_again = forms.CharField(widget=forms.PasswordInput, min_length=8, max_length=32)
     email = forms.EmailField()
-    teacher = forms.BooleanField()
+    teacher = forms.BooleanField(required=False)
 
     def clean(self):
         cleaned_data = super(CreateUserForm, self).clean()
@@ -20,7 +20,6 @@ class CreateUserForm(forms.Form):
         password = cleaned_data.get("password")
         password_again = cleaned_data.get("password_again")
         email = cleaned_data.get("email")
-        teacher = cleaned_data.get("teacher")
         if password != password_again:
             self.add_error("password_again", "Пароли должны совпадать!")
         if Teacher.objects.filter(username=login) or Student.objects.filter(username=login):

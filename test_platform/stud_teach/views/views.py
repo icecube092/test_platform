@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.views import View
 
 # Create your views here.
 from stud_teach.models import Test
@@ -22,33 +23,50 @@ def tests_list(request, page: int):
                   {"tests": tests, "page": page, "prev_page": prev_page, "next_page": next_page})
 
 
-def test_page(request):
-    test_id = request.GET.get("test_id")
-    if test_id:
-        try:
-            user = Teacher.objects.get(id=request.user.id)
-        except Teacher.DoesNotExist:
+class TestPage(View):
+    """
+    страница с тестом
+    """
+    def get(self, request):
+        test_id = request.GET.get("test_id")
+        if test_id:
+            try:
+                user = Teacher.objects.get(id=request.user.id)
+            except Teacher.DoesNotExist:
+                try:
+                    user = Student.objects.get(id=request.user.id)
+                except Student.DoesNotExist:
+                    user = AnonymousUser()
+            test = get_object_or_404(Test, pk=test_id)
+            students_pass = Student.objects.filter(done_tests=test.id)
+            results = {}
+            for student in students_pass:
+                result = student.resulttest_set.get(test=test)
+                results.update({student: result})
+            questions = test.questions.all()
+            is_teacher = isinstance(user, Teacher)
+            is_student = isinstance(user, Student)
+            passed = 0
+            if is_student:
+                try:
+                    user.done_tests.get(id=test_id)
+                    passed = user.resulttest_set.get(test=test).passed
+                except Test.DoesNotExist:
+                    passed = 0
+            return render(request, "test_page.html",
+                          {"results": results, "questions": questions, "is_teacher": is_teacher,
+                           "is_student": is_student, "passed": passed, "test": test})
+        else:
+            return HttpResponseRedirect("../tests/1")
+
+    def post(self, request):
+        test_id = request.GET.get("test_id")
+        if test_id:
             try:
                 user = Student.objects.get(id=request.user.id)
             except Student.DoesNotExist:
-                user = AnonymousUser()
-        test = get_object_or_404(Test, pk=test_id)
-        questions = test.questions.all()
-        if enter and request.method == "POST":
-            if request.user.is_authenticated:
-                if user.username in pending:
-                    project.users_pending.remove(user)
-                elif user.username in members:
-                    project.members.remove(user)
-                else:
-                    project.users_pending.add(user)
-                return HttpResponseRedirect(
-                    f"/projects/?project_id={test_id}")
-            else:
-                return HttpResponseRedirect("/login/")
-        return render(request, "projects/project_page.html",
-                      {"project": project, "members": members,
-                       "comments": comments, "pending": pending,
-                       "is_member": is_member, "is_owner": is_owner})
-    else:
-        return HttpResponseRedirect("../tests/1")
+                return HttpResponse("Вы не студент")
+
+            return HttpResponseRedirect(f"/tests/?test_id={test_id}")
+        else:
+            return HttpResponseRedirect("../tests/1")

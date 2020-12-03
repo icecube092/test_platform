@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if is_teacher %}
+        Прошли тест:
+        <ul>
+            {% for student, result in results.items %}
+                <li>
+                    <a href="#">{{student.username}} - {{result.passed}} из {{result.questions.count}}</a>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit">Сбросить</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif is_student %}
+        {% if passed %}
+            Твой результат: {{passed}} из {{test.questions.count}}
+        {% else %}
+            <form method="post" action="">
+                {% csrf_token %}
+                <ol>
+                    {% for question in questions %}
+                    <li>
+                        <p>{{question.text}}</p>
+                        <ul>
+                            <li><input name="{{question.id}}" type="radio" value="1">{{question.option_1}}</li>
+                            <li><input name="{{question.id}}" type="radio" value="2">{{question.option_2}}</li>
+                            <li><input name="{{question.id}}" type="radio" value="3">{{question.option_3}}</li>
+                            <li><input name="{{question.id}}" type="radio" value="4">{{question.option_4}}</li>
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ol>
+                <button type="submit">Отправить</button>
+            </form>
+        {% endif %}
+    {% else %}
+        Войдите, чтобы пройти тест
+    {% endif %}
+{% endblock %}
