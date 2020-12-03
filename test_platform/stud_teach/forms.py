@@ -43,3 +43,7 @@ class UserAuthorize(forms.Form):
         if not authenticate(username=login, password=password):
             self.add_error("password", "Неверный логин или пароль")
         return self.cleaned_data
+
+
+class PassedTestForm(forms.Form):
+    questions = ...

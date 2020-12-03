@@ -8,6 +8,8 @@ from stud_teach.models import Test
 
 from stud_teach.models import Teacher, Student
 
+from stud_teach.forms import PassedTestForm
+
 items_on_page = 10
 
 
@@ -29,23 +31,25 @@ class TestPage(View):
     """
     def get(self, request):
         test_id = request.GET.get("test_id")
+        test = get_object_or_404(Test, pk=test_id)
+        is_teacher = False
+        is_student = False
         if test_id:
             try:
                 user = Teacher.objects.get(id=request.user.id)
+                is_teacher = True
             except Teacher.DoesNotExist:
                 try:
                     user = Student.objects.get(id=request.user.id)
+                    is_student = True
                 except Student.DoesNotExist:
                     user = AnonymousUser()
-            test = get_object_or_404(Test, pk=test_id)
             students_pass = Student.objects.filter(done_tests=test.id)
             results = {}
             for student in students_pass:
                 result = student.resulttest_set.get(test=test)
                 results.update({student: result})
             questions = test.questions.all()
-            is_teacher = isinstance(user, Teacher)
-            is_student = isinstance(user, Student)
             passed = 0
             if is_student:
                 try:
@@ -66,7 +70,7 @@ class TestPage(View):
                 user = Student.objects.get(id=request.user.id)
             except Student.DoesNotExist:
                 return HttpResponse("Вы не студент")
-
+            print(request.POST)
             return HttpResponseRedirect(f"/tests/?test_id={test_id}")
         else:
             return HttpResponseRedirect("../tests/1")

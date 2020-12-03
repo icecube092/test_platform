@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from stud_teach.forms import CreateUserForm
 
@@ -51,4 +51,33 @@ def logout_user(request):
 
 
 def profile(request):
-    return
+    """
+    профиль пользователя
+    """
+    user_id = request.GET.get("user_id")
+    edit = request.GET.get("edit")
+    profile = get_object_or_404(UserProfile, id=user_id)
+    projects = profile.project_set.all()
+    is_owner = profile.id == request.user.id
+    if edit and is_owner:
+        if request.method == "GET":
+            form = EditProfileForm(initial={"level": profile.level,
+                                            "about": profile.about})
+            return render(request, "user_info/edit_profile.html",
+                          {"form": form, "profile": profile})
+        elif request.method == "POST":
+            form = EditProfileForm(request.POST)
+            if form.is_valid():
+                level = form.cleaned_data["level"]
+                for level_set in UserProfile.LEVELS:
+                    if level in level_set:
+                        profile.level = level_set[1]
+                        break
+                profile.about = form.cleaned_data["about"]
+                profile.save()
+            return render(request, "user_info/edit_profile.html",
+                          {"form": form})
+    else:
+        return render(request, "user_info/profile.html",
+                      {"profile": profile, "is_owner": is_owner,
+                       "projects": projects})
