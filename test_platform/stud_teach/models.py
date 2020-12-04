@@ -14,7 +14,7 @@ class Question(models.Model):
         ("3", option_3),
         ("2", option_4)
     )
-    right = models.CharField(max_length=10, choices=OPTIONS, name="Правильный ответ")
+    right = models.CharField(max_length=10, choices=OPTIONS, verbose_name = "Правильный ответ")
 
     def __str__(self):
         return self.text
@@ -39,7 +39,7 @@ class Test(models.Model):
 class Student(User):
     avatar = models.ImageField(blank=True)
     phone = models.CharField(max_length=11, blank=True)
-    done_tests = models.ManyToManyField(Test, related_name="done_tests")
+    done_tests = models.ManyToManyField(Test, related_name="done_tests", blank=True)
 
     class Meta:
         verbose_name = "Студент"
@@ -51,7 +51,7 @@ class Student(User):
 
 class ResultTest(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    passed = models.IntegerField()
+    passed = models.IntegerField(default=0)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
     def __str__(self):

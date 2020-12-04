@@ -5,8 +5,8 @@
         <ul>
             {% for student, result in results.items %}
                 <li>
-                    <a href="#">{{student.username}} - {{result.passed}} из {{result.questions.count}}</a>
-                    <form method="post">
+                    <a href="#">{{student.username}}</a> - {{result.passed}} из {{test.questions.count}}
+                    <form method="post" action="/tests/?test_id={{test.id}}&reset_id={{student.id}}" onsubmit="return checkSubmit()">
                         {% csrf_token %}
                         <button type="submit">Сбросить</button>
                     </form>
@@ -14,7 +14,7 @@
             {% endfor %}
         </ul>
     {% elif is_student %}
-        {% if passed %}
+        {% if passed >= 0 %}
             Твой результат: {{passed}} из {{test.questions.count}}
         {% else %}
             <form method="post" action="/tests/?test_id={{test.id}}">
@@ -38,4 +38,12 @@
     {% else %}
         Войдите, чтобы пройти тест
     {% endif %}
+    <script type="text/javascript">
+        function checkSubmit(){
+            let ok = confirm("Сбросить результат теста?");
+            if (!ok) {
+                return false
+            };
+        }
+    </script>
 {% endblock %}

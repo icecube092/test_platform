@@ -10,6 +10,8 @@ from stud_teach.models import Teacher, Student
 
 from stud_teach.forms import PassedTestForm
 
+from stud_teach.models import ResultTest
+
 items_on_page = 10
 
 
@@ -50,13 +52,13 @@ class TestPage(View):
                 result = student.resulttest_set.get(test=test)
                 results.update({student: result})
             questions = test.questions.all()
-            passed = 0
+            passed = -1
             if is_student:
                 try:
                     user.done_tests.get(id=test_id)
                     passed = user.resulttest_set.get(test=test).passed
                 except Test.DoesNotExist:
-                    passed = 0
+                    passed = -1
             return render(request, "test_page.html",
                           {"results": results, "questions": questions, "is_teacher": is_teacher,
                            "is_student": is_student, "passed": passed, "test": test})
@@ -66,11 +68,39 @@ class TestPage(View):
     def post(self, request):
         test_id = request.GET.get("test_id")
         if test_id:
+            is_teacher = False
+            is_student = False
             try:
-                user = Student.objects.get(id=request.user.id)
-            except Student.DoesNotExist:
-                return HttpResponse("Вы не студент")
-            print(request.POST)
+                user = Teacher.objects.get(id=request.user.id)
+                is_teacher = True
+            except Teacher.DoesNotExist:
+                try:
+                    user = Student.objects.get(id=request.user.id)
+                    is_student = True
+                except Student.DoesNotExist:
+                    user = AnonymousUser()
+            if is_student:
+                test = get_object_or_404(Test, pk=test_id)
+                right_answers = tuple(question.right for question in test.questions.all())
+                user_result = 0
+                answers = request.POST.dict()
+                answers.pop("csrfmiddlewaretoken")
+                for key, right in zip(answers, right_answers):
+                    if answers[key][0] == right:
+                        user_result += 1
+                user.done_tests.add(test)
+                result = ResultTest()
+                result.test = test
+                result.passed = user_result
+                result.student = user
+                result.save()
+            elif is_teacher:
+                reset_id = request.GET.get("reset_id")
+                if reset_id:
+                    student = Student.objects.get(id=reset_id)
+                    test = Test.objects.get(id=test_id)
+                    student.done_tests.remove(test)
+                    ResultTest.objects.filter(student=student, test=test).delete()
             return HttpResponseRedirect(f"/tests/?test_id={test_id}")
         else:
             return HttpResponseRedirect("../tests/1")
