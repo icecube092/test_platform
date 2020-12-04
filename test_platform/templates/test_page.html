@@ -6,7 +6,7 @@
             {% for student, result in results.items %}
                 <li>
                     <a href="#">{{student.username}}</a> - {{result.passed}} из {{test.questions.count}}
-                    <form method="post" action="/tests/?test_id={{test.id}}&reset_id={{student.id}}" onsubmit="return checkSubmit()">
+                    <form method="post" action="{% url 'test_page' %}?test_id={{test.id}}&reset_id={{student.id}}" onsubmit="return checkSubmit()">
                         {% csrf_token %}
                         <button type="submit">Сбросить</button>
                     </form>
@@ -17,7 +17,7 @@
         {% if passed >= 0 %}
             Твой результат: {{passed}} из {{test.questions.count}}
         {% else %}
-            <form method="post" action="/tests/?test_id={{test.id}}">
+            <form method="post" action="{% url 'test_page' %}?test_id={{test.id}}">
                 {% csrf_token %}
                 <ol>
                     {% for question in questions %}
