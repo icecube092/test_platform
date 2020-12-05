@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} Профиль {{profile.username}}{% endblock %}
+
+{% block content %}
+    {% if request.user.is_authenticated %}
+            <h1>Профиль {{user.username}}
+                {% if is_owner %} (Вы) {% endif %}</h1>
+            <form method="post">
+                Телефон <input type="tel" name="phone" value="{{user.phone}}"
+                           {% if not is_owner%} readonly {% endif %}>
+                {% if is_owner %} <button type="submit">Изменить</button> {% endif %}
+            </form>
+            <br>
+            <img src="/media/{{user.photo}}">
+            <form method="post" enctype="multipart/form-data">
+                Фото <input type="file" name="photo" value="{{user.avatar}}" accept="image/jpeg">
+                <button type="submit">Отправить</button>
+            </form>
+    {% else %}
+        Войдите, чтобы просмотреть профиль
+    {% endif %}
+{% endblock %}

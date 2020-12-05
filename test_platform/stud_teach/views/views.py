@@ -1,14 +1,13 @@
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.views import View
 
 # Create your views here.
 from stud_teach.models import Test
 
 from stud_teach.models import Teacher, Student
-
-from stud_teach.forms import PassedTestForm
 
 from stud_teach.models import ResultTest
 
@@ -33,10 +32,10 @@ class TestPage(View):
     """
     def get(self, request):
         test_id = request.GET.get("test_id")
-        test = get_object_or_404(Test, pk=test_id)
-        is_teacher = False
-        is_student = False
         if test_id:
+            test = get_object_or_404(Test, pk=test_id)
+            is_teacher = False
+            is_student = False
             try:
                 user = Teacher.objects.get(id=request.user.id)
                 is_teacher = True
@@ -63,7 +62,7 @@ class TestPage(View):
                           {"results": results, "questions": questions, "is_teacher": is_teacher,
                            "is_student": is_student, "passed": passed, "test": test})
         else:
-            return HttpResponseRedirect("../tests/1")
+            return HttpResponseRedirect(reverse("tests_list", args=[1]))
 
     def post(self, request):
         test_id = request.GET.get("test_id")
@@ -101,6 +100,6 @@ class TestPage(View):
                     test = Test.objects.get(id=test_id)
                     student.done_tests.remove(test)
                     ResultTest.objects.filter(student=student, test=test).delete()
-            return HttpResponseRedirect(f"/tests/?test_id={test_id}")
+            return HttpResponseRedirect(f"{reverse('test_page')}?test_id={test_id}")
         else:
-            return HttpResponseRedirect("../tests/1")
+            return HttpResponseRedirect(reverse("tests_list", args=[1]))

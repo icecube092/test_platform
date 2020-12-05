@@ -9,7 +9,7 @@
     {% block header %}
         <div>
             {% if request.user.is_authenticated %}
-                <a href="/profile">Профиль</a>
+                <a href="/profile/?user_id={{user.id}}">Профиль</a>
                 <a href="/logout">Выйти</a>
             {% else %}
                 <a href="/login">Войти</a>

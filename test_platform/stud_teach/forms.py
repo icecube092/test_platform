@@ -45,5 +45,7 @@ class UserAuthorize(forms.Form):
         return self.cleaned_data
 
 
-class PassedTestForm(forms.Form):
-    questions = ...
+class Profile(forms.Form):
+    username = forms.CharField()
+    avatar = forms.ImageField()
+    phone = forms.CharField()
