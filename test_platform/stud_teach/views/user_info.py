@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -18,12 +18,16 @@ def register(request):
         if form.is_valid():
             if form.cleaned_data.get("teacher"):
                 user = Teacher()
+                user.is_staff = True
             else:
                 user = Student()
             user.username = form.cleaned_data.get("login")
             user.set_password(form.cleaned_data.get("password"))
             user.email = form.cleaned_data.get("email")
             user.save()
+            if isinstance(user, Teacher):
+                group = Group.objects.get(name="Teachers")  # предварительно нужно создать группу
+                group.user_set.add(user)
             authenticate(username = user.username, password = user.password)
             return HttpResponseRedirect("/login/")
         else:
@@ -62,11 +66,17 @@ class Profile(View):
             except Student.DoesNotExist:
                 return HttpResponseRedirect(reverse("tests_list", args=[1]))
             is_owner = request.user.id == user.id
+            tests = user.done_tests.all()
             return render(request, "profile.html",
-                          {"user": user, "is_owner": is_owner})
+                          {"user": user, "is_owner": is_owner, "tests": tests})
         else:
             return HttpResponseRedirect(reverse("tests_list", args=[1]))
 
     def post(self, request):
+        print(request.POST)
+        print(request.FILES)
+        form = Profile(request.POST, request.FILES)
+        print(form)
         user_id = request.GET.get("user_id")
+        photo = request.POST.get("photo")
         return HttpResponseRedirect(f"{reverse('profile')}?user_id={user_id}")

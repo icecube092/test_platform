@@ -6,17 +6,26 @@
     {% if request.user.is_authenticated %}
             <h1>Профиль {{user.username}}
                 {% if is_owner %} (Вы) {% endif %}</h1>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}?user_id={{user.id}}">
+                {% csrf_token %}
                 Телефон <input type="tel" name="phone" value="{{user.phone}}"
                            {% if not is_owner%} readonly {% endif %}>
-                {% if is_owner %} <button type="submit">Изменить</button> {% endif %}
+                <br>
+                Фото <input type="file" name="photo" accept="image/*">
+                <br>
+                {% if is_owner %}
+                    <button type="submit">Отправить</button>
+                {% endif %}
             </form>
-            <br>
-            <img src="/media/{{user.photo}}">
-            <form method="post" enctype="multipart/form-data">
-                Фото <input type="file" name="photo" value="{{user.avatar}}" accept="image/jpeg">
-                <button type="submit">Отправить</button>
-            </form>
+            <img src="/media/{{user.photo}}"><br>
+            Пройденные тесты:
+            <ul>
+                {% for test in tests %}
+                    <li>
+                        <a href="{% url 'test_page' %}?test_id={{test.id}}">{{test.title}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
     {% else %}
         Войдите, чтобы просмотреть профиль
     {% endif %}

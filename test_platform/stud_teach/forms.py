@@ -46,6 +46,5 @@ class UserAuthorize(forms.Form):
 
 
 class Profile(forms.Form):
-    username = forms.CharField()
     avatar = forms.ImageField()
     phone = forms.CharField()

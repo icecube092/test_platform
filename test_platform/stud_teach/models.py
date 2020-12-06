@@ -1,20 +1,22 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
 class Question(models.Model):
     text = models.CharField(max_length=250)
-    option_1 = models.CharField(max_length=100)
-    option_2 = models.CharField(max_length=100)
-    option_3 = models.CharField(max_length=100)
-    option_4 = models.CharField(max_length=100)
+    option_1 = models.CharField(max_length=100, verbose_name="Вариант 1")
+    option_2 = models.CharField(max_length=100, verbose_name="Вариант 2")
+    option_3 = models.CharField(max_length=100, verbose_name="Вариант 3")
+    option_4 = models.CharField(max_length=100, verbose_name="Вариант 4")
     OPTIONS = (
-        ("1", option_1),
-        ("2", option_2),
-        ("3", option_3),
-        ("2", option_4)
+        ("1", option_1.verbose_name),
+        ("2", option_2.verbose_name),
+        ("3", option_3.verbose_name),
+        ("4", option_4.verbose_name)
     )
-    right = models.CharField(max_length=10, choices=OPTIONS, verbose_name = "Правильный ответ")
+    right = models.CharField(max_length=10, choices=OPTIONS, verbose_name="Правильный ответ")
 
     def __str__(self):
         return self.text
@@ -37,7 +39,7 @@ class Test(models.Model):
 
 
 class Student(User):
-    avatar = models.ImageField(blank=True)
+    avatar = models.ImageField(blank=True, upload_to=f"users/{datetime.datetime.now()}")
     phone = models.CharField(max_length=11, blank=True)
     done_tests = models.ManyToManyField(Test, related_name="done_tests", blank=True)
 
@@ -53,6 +55,7 @@ class ResultTest(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     passed = models.IntegerField(default=0)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    at = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return f"{self.test.title} - {self.student.username}"
