@@ -39,7 +39,7 @@ class Test(models.Model):
 
 
 class Student(User):
-    avatar = models.ImageField(blank=True, upload_to=f"users/{datetime.datetime.now()}")
+    avatar = models.ImageField(blank=True)
     phone = models.CharField(max_length=11, blank=True)
     done_tests = models.ManyToManyField(Test, related_name="done_tests", blank=True)
 

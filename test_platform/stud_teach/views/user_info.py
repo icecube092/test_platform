@@ -11,6 +11,8 @@ from stud_teach.models import Teacher, Student
 
 from stud_teach.forms import UserAuthorize
 
+from stud_teach.forms import ProfileForm
+
 
 def register(request):
     if request.method == "POST":
@@ -62,21 +64,27 @@ class Profile(View):
         user_id = request.GET.get("user_id")
         if user_id:
             try:
-                user = Student.objects.get(id=request.user.id)
+                user = Student.objects.get(id=user_id)
             except Student.DoesNotExist:
                 return HttpResponseRedirect(reverse("tests_list", args=[1]))
             is_owner = request.user.id == user.id
             tests = user.done_tests.all()
+            form = ProfileForm(instance=user)
             return render(request, "profile.html",
-                          {"user": user, "is_owner": is_owner, "tests": tests})
+                          {"user": user, "is_owner": is_owner, "tests": tests, "form": form})
         else:
             return HttpResponseRedirect(reverse("tests_list", args=[1]))
 
     def post(self, request):
-        print(request.POST)
-        print(request.FILES)
-        form = Profile(request.POST, request.FILES)
-        print(form)
         user_id = request.GET.get("user_id")
-        photo = request.POST.get("photo")
-        return HttpResponseRedirect(f"{reverse('profile')}?user_id={user_id}")
+        if user_id:
+            try:
+                user = Student.objects.get(id=user_id)
+            except Student.DoesNotExist:
+                return HttpResponseRedirect(reverse("tests_list", args=[1]))
+            form = ProfileForm(request.POST, request.FILES, instance=user)
+            if form.is_valid():
+                form.save()
+            return HttpResponseRedirect(f"{reverse('profile')}?user_id={user_id}")
+        else:
+            return HttpResponseRedirect(reverse("tests_list", args=[1]))

@@ -4,21 +4,9 @@
 
 {% block content %}
     {% if request.user.is_authenticated %}
-            <h1>Профиль {{user.username}}
-                {% if is_owner %} (Вы) {% endif %}</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}?user_id={{user.id}}">
-                {% csrf_token %}
-                Телефон <input type="tel" name="phone" value="{{user.phone}}"
-                           {% if not is_owner%} readonly {% endif %}>
-                <br>
-                Фото <input type="file" name="photo" accept="image/*">
-                <br>
-                {% if is_owner %}
-                    <button type="submit">Отправить</button>
-                {% endif %}
-            </form>
-            <img src="/media/{{user.photo}}"><br>
-            Пройденные тесты:
+            <img src="/media/{{user.avatar}}" alt="Фото не найдено"><br>
+        Телефон: {{user.phone}}<br>
+        Пройденные тесты:
             <ul>
                 {% for test in tests %}
                     <li>
@@ -26,6 +14,13 @@
                     </li>
                 {% endfor %}
             </ul>
+        {% if is_owner %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{form.as_p}}
+                <button type="submit">Сохранить</button>
+            </form>
+        {% endif %}
     {% else %}
         Войдите, чтобы просмотреть профиль
     {% endif %}

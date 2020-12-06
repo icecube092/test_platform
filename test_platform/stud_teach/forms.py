@@ -45,6 +45,7 @@ class UserAuthorize(forms.Form):
         return self.cleaned_data
 
 
-class Profile(forms.Form):
-    avatar = forms.ImageField()
-    phone = forms.CharField()
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ["avatar", "phone"]
