@@ -16,12 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns, static
 from django.http import HttpResponseRedirect
-from django.urls import path, include
+from django.urls import path, include, reverse
 
 from test_platform import settings
 from stud_teach.views import user_info, views
 
 urlpatterns = [
+    path('', lambda page: HttpResponseRedirect(reverse("tests_list", args=[1]))),
     path('admin/', admin.site.urls),
     path('tests/', include("stud_teach.urls")),
     path('login/', user_info.login_user, name='login'),

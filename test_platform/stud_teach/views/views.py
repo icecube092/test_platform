@@ -1,15 +1,9 @@
 from django.contrib.auth.models import AnonymousUser
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views import View
-
-# Create your views here.
-from stud_teach.models import Test
-
-from stud_teach.models import Teacher, Student
-
-from stud_teach.models import ResultTest
+from stud_teach.models import ResultTest, Teacher, Student, Test
 
 items_on_page = 10
 

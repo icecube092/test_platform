@@ -1,17 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
-
-from stud_teach.forms import CreateUserForm
-
+from stud_teach.forms import UserAuthorize, ProfileForm, CreateUserForm
 from stud_teach.models import Teacher, Student
-
-from stud_teach.forms import UserAuthorize
-
-from stud_teach.forms import ProfileForm
 
 
 def register(request):
