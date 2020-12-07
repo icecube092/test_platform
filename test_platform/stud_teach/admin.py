@@ -53,6 +53,5 @@ smtp = config["smtp"]
 #             post.quit()
 #             send_time = cron.get_next(datetime.datetime)
 
-
 # email_task = Thread(target=send_email)
 # email_task.start()
