@@ -3,7 +3,6 @@ import smtplib
 from configparser import ConfigParser
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from threading import Thread
 
 import croniter
 from django.contrib import admin
@@ -52,7 +51,3 @@ def send_email():
             post.send_message(msg)
             post.quit()
             send_time = cron.get_next(datetime.datetime)
-
-
-email_task = Thread(target=send_email)
-email_task.start()
