@@ -1,5 +1,8 @@
 Установка проекта:
-
+1. docker build -t tests Dockerfile
+2. docker run -it tests
+3. python3 manage.py makemigrations
+4. python3 manage.py migrate
 
 Запуск и использование проекта:
 0. Заполнить конфиг
