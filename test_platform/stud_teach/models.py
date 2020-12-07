@@ -58,7 +58,7 @@ class ResultTest(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     passed = models.IntegerField(default=0)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    at = models.DateTimeField(default=timezone.now())
+    at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.test.title} - {self.student.username}"
