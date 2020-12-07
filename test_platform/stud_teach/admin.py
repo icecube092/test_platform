@@ -17,9 +17,9 @@ admin.site.register(Test)
 admin.site.register(ResultTest)
 
 
-config = ConfigParser()
-config.read("config.ini")
-smtp = config["smtp"]
+# config = ConfigParser()
+# config.read("config.ini")
+# smtp = config["smtp"]
 
 
 # def send_email():
