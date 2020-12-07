@@ -22,8 +22,8 @@ smtp = config["smtp"]
 class StudTeachConfig(AppConfig):
     name = 'stud_teach'
 
-    def ready(self):
-        signals.request_started.connect(send_mail, sender=self)
+    # def ready(self):
+    #     signals.request_started.connect(send_mail, sender=self)
 
 
 def send_mail(sender, **kwargs):
